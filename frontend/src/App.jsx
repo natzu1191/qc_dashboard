@@ -5,9 +5,9 @@ import './App.css'
 function App() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
-
+  const apiUrl = import.meta.env.VITE_API_URL
   useEffect(() => {
-    fetch('/api/dashboard')
+    fetch(apiUrl + '/api/dashboard')
       .then(res => res.json())
       .then(data => {
         setData(data)
