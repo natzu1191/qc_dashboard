@@ -5,11 +5,14 @@ from typing import List
 from datetime import datetime
 
 app = FastAPI()
-
+origins = [
+    "https://qc-dashboard-8fq5.vercel.app",
+    "http://localhost:5173"
+]
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite default port
+    allow_origins=origins,  # Vite default port
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
