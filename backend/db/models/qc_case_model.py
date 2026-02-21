@@ -12,7 +12,11 @@ class QC_CaseBase(SQLModel):
     actual: str
     standard: str
     status: int
-    updatedDate: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updatedDate: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), sa_column=Column(
+            DateTime(timezone=True),
+            server_default=func.now(),  # DB-side default
+            nullable=False
+        ))
     qc_disposition: Optional[str] = None
     notes: Optional[str] = None
 

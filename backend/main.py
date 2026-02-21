@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from classes import *
+#add controllers
+from routers import qc_controller
 
 app = FastAPI()
 origins = [
@@ -56,6 +58,8 @@ async def get_dashboard_data():
 @app.get("/")
 async def root():
     return {"message": "QC Dashboard API"}
+
+app.include_router(qc_controller.router)
 
 if __name__ == "__main__":
     import uvicorn
