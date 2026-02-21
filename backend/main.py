@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List
-from datetime import datetime
+from classes import *
 
 app = FastAPI()
 origins = [
@@ -17,36 +15,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Models
-class QualityIssue(BaseModel):
-    month: str
-    count: int
-
-class DisableRate(BaseModel):
-    month: str
-    percentage: int
-
-class PendingResamples(BaseModel):
-    not_resampled: int
-    for_investigation: int
-    resolved: int
-
-class QsRating(BaseModel):
-    feedback: str
-    value: int
-
-class CustomerComplaint(BaseModel):
-    month: str
-    count: int
-
-class DashboardData(BaseModel):
-    quality_issues: List[QualityIssue]
-    disable_rates: List[DisableRate]
-    pending_resamples: PendingResamples
-    qs_ratings: List[QsRating]
-    customer_complaints: List[CustomerComplaint]
-    year: int
 
 # Placeholder data
 @app.get("/api/dashboard", response_model=DashboardData)
