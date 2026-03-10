@@ -1,7 +1,4 @@
 {
-  "functions": {
-    "main.py": {}
-  },
   "routes": [
     {
       "src": "/(.*)",
