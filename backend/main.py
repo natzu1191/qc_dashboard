@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from classes import *
 #add controllers
 from routers import qc_controller
-from db.repositories.qc_case import get_cases_count_by_status
+# from db.repositories.qc_case import get_cases_count_by_status
 app = FastAPI()
 origins = [
     "https://qc-dashboard-8fq5.vercel.app",
@@ -21,7 +21,7 @@ app.add_middleware(
 # Placeholder data
 @app.get("/api/dashboard", response_model=DashboardData)
 async def get_dashboard_data():
-    cases_count_dict = await get_cases_count_by_status()
+    # cases_count_dict = await get_cases_count_by_status()
 
     return {
         "quality_issues": [
@@ -38,9 +38,9 @@ async def get_dashboard_data():
             {"month": "April", "percentage": 60}
         ],
         "pending_resamples": {
-            "not_resampled": cases_count_dict["1"],
-            "for_investigation": cases_count_dict["2"],
-            "resolved": cases_count_dict["3"]
+            "not_resampled": 150,
+            "for_investigation": 100,
+            "resolved": 50
         },
         "qs_ratings": [
             {"feedback": "FORMULA", "value": 85},
