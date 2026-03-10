@@ -1,8 +1,6 @@
 {
   "functions": {
-    "main.py": {
-      "runtime": "python3.12"
-    }
+    "main.py": {}
   },
   "routes": [
     {
