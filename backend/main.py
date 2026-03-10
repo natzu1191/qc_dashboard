@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List
-from datetime import datetime
-
+from classes import *
+#add controllers
+from routers import qc_controller
+from db.repositories.qc_case import get_cases_count_by_status
 app = FastAPI()
 origins = [
     "https://qc-dashboard-8fq5.vercel.app",
@@ -18,39 +18,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Models
-class QualityIssue(BaseModel):
-    month: str
-    count: int
-
-class DisableRate(BaseModel):
-    month: str
-    percentage: int
-
-class PendingResamples(BaseModel):
-    not_resampled: int
-    for_investigation: int
-    resolved: int
-
-class QsRating(BaseModel):
-    feedback: str
-    value: int
-
-class CustomerComplaint(BaseModel):
-    month: str
-    count: int
-
-class DashboardData(BaseModel):
-    quality_issues: List[QualityIssue]
-    disable_rates: List[DisableRate]
-    pending_resamples: PendingResamples
-    qs_ratings: List[QsRating]
-    customer_complaints: List[CustomerComplaint]
-    year: int
-
 # Placeholder data
 @app.get("/api/dashboard", response_model=DashboardData)
 async def get_dashboard_data():
+    cases_count_dict = await get_cases_count_by_status()
+
     return {
         "quality_issues": [
             {"month": "Jan", "count": 4},
@@ -66,9 +38,9 @@ async def get_dashboard_data():
             {"month": "April", "percentage": 60}
         ],
         "pending_resamples": {
-            "not_resampled": 150,
-            "for_investigation": 5,
-            "resolved": 8
+            "not_resampled": cases_count_dict["1"],
+            "for_investigation": cases_count_dict["2"],
+            "resolved": cases_count_dict["3"]
         },
         "qs_ratings": [
             {"feedback": "FORMULA", "value": 85},
@@ -88,6 +60,8 @@ async def get_dashboard_data():
 @app.get("/")
 async def root():
     return {"message": "QC Dashboard API"}
+
+app.include_router(qc_controller.router)
 
 if __name__ == "__main__":
     import uvicorn
