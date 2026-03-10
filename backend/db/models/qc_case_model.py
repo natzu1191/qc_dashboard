@@ -33,9 +33,9 @@ class QC_Case(QC_CaseBase, table=True):
 class QCCreate(QC_CaseBase):
     pass
 class QCUpdate(SQLModel):
-    date: Optional[datetime] = None
+    # date: Optional[datetime] = None
     code: Optional[str] = None
-    batch_number: Optional[str] = None
+    # batch_number: Optional[str] = None
     reason: Optional[str] = None
     actual: Optional[str] = None
     standard: Optional[str] = None
