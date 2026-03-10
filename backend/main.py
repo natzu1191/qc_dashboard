@@ -1,29 +1,27 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.ext.asyncio import AsyncSession
 from classes import *
+#add controllers
 from routers import qc_controller
 from db.repositories.qc_case import get_cases_count_by_status
-from database import get_session
-
 app = FastAPI()
-
 origins = [
     "https://qc-dashboard-8fq5.vercel.app",
     "http://localhost:5173"
 ]
-
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins,  # Vite default port
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Placeholder data
 @app.get("/api/dashboard", response_model=DashboardData)
-async def get_dashboard_data(db: AsyncSession = Depends(get_session)):
-    cases_count_dict = await get_cases_count_by_status(db)
+async def get_dashboard_data():
+    cases_count_dict = await get_cases_count_by_status()
 
     return {
         "quality_issues": [
@@ -40,9 +38,9 @@ async def get_dashboard_data(db: AsyncSession = Depends(get_session)):
             {"month": "April", "percentage": 60}
         ],
         "pending_resamples": {
-            "not_resampled": cases_count_dict.get(1, 0),
-            "for_investigation": cases_count_dict.get(2, 0),
-            "resolved": cases_count_dict.get(3, 0)
+            "not_resampled": cases_count_dict["1"],
+            "for_investigation": cases_count_dict["2"],
+            "resolved": cases_count_dict["3"]
         },
         "qs_ratings": [
             {"feedback": "FORMULA", "value": 85},
@@ -64,3 +62,7 @@ async def root():
     return {"message": "QC Dashboard API"}
 
 app.include_router(qc_controller.router)
+
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8000)
