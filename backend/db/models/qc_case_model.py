@@ -19,6 +19,9 @@ class QC_CaseBase(SQLModel):
         ))
     qc_disposition: Optional[str] = None
     notes: Optional[str] = None
+    result_after_resample: Optional[float] = None
+    disposition_result: Optional[str] = None
+    disposition_conditions: Optional[str] = None
 
 class QC_Case(QC_CaseBase, table=True):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
@@ -42,4 +45,7 @@ class QCUpdate(SQLModel):
     status: Optional[int] = None
     qc_disposition: Optional[str] = None
     notes: Optional[str] = None
+    result_after_resample: Optional[float] = None
+    disposition_result: Optional[str] = None
+    disposition_conditions: Optional[str] = None
     updatedDate: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

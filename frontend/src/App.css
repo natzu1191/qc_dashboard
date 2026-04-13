@@ -284,6 +284,7 @@
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border-color);
+  position: relative;
 }
 
 .rating-bar {
@@ -293,6 +294,16 @@
   transition: width 1s ease-out;
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
   animation: slideIn 1s ease-out;
+}
+
+.rating-count {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 /* Loading State */
@@ -901,5 +912,115 @@ input[type="date"].form-input::-webkit-calendar-picker-indicator {
   font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Edit modal (narrower) */
+.edit-modal {
+  max-width: 480px;
+}
+
+.edit-modal-body {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto;
+}
+
+/* Stacked modal (EditCaseModal on top of ResamplesModal) */
+.modal-backdrop--top {
+  z-index: 200;
+}
+
+/* Select input matching form-input style */
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.form-select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* Edit button in table rows */
+.edit-row-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.edit-row-btn:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+/* Ghost (cancel) button variant */
+.submit-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.submit-btn--ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+  box-shadow: none;
+  transform: none;
+}
+
+/* Checkbox group */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  transition: all 0.2s ease;
+}
+
+.checkbox-label:hover {
+  border-color: var(--accent-purple);
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.checkbox-input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-purple);
+  cursor: pointer;
+}
+
+.checkbox-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
   letter-spacing: 0.5px;
 }
