@@ -19,3 +19,6 @@ class UpdateCaseRequest(BaseModel):
     status: Optional[int] = None
     qc_disposition: Optional[str] = None
     notes: Optional[str] = None
+    result_after_resample: Optional[float] = None
+    disposition_result: Optional[str] = None
+    disposition_conditions: Optional[str] = None
