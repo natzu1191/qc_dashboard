@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import qc_controller
+from fastapi.staticfiles import StaticFiles
+from routers import qc_controller, complaint_controller
+import os
 
 app = FastAPI()
 origins = [
@@ -15,11 +17,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Serve uploaded files
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
 @app.get("/")
 async def root():
     return {"message": "QC Dashboard API"}
 
 app.include_router(qc_controller.router)
+app.include_router(complaint_controller.router)
 
 if __name__ == "__main__":
     import uvicorn

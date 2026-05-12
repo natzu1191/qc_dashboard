@@ -4,6 +4,7 @@ import os
 from alembic import context
 from sqlalchemy import create_engine, pool
 from db.models.qc_case_model import QC_Case
+from db.models.customer_complaint_model import CustomerComplaint
 
 import sqlmodel
 import sqlalchemy as sa
