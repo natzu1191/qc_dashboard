@@ -113,6 +113,183 @@ function LogEntryPage({ apiUrl, onCreated }) {
   )
 }
 
+function CustomerComplaintPage({ apiUrl, onCreated }) {
+  const today = new Date().toISOString().split('T')[0]
+  const [form, setForm] = useState({
+    date: today,
+    code: '',
+    batch_number: '',
+    reason: '',
+    qc_validation: '',
+    is_valid: true,
+  })
+  const [files, setFiles] = useState([])
+  const [status, setStatus] = useState(null)
+  const [errorMsg, setErrorMsg] = useState('')
+
+  const handleChange = (e) => {
+    const { name, value, type } = e.target
+    setForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? e.target.checked : value,
+    }))
+    if (status) setStatus(null)
+  }
+
+  const handleFileChange = (e) => {
+    setFiles(Array.from(e.target.files))
+    if (status) setStatus(null)
+  }
+
+  const removeFile = (index) => {
+    setFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleSubmit = async () => {
+    const required = ['date', 'code', 'batch_number', 'reason', 'qc_validation']
+    const missing = required.filter(k => !String(form[k]).trim())
+    if (missing.length) {
+      setErrorMsg(`Please fill in: ${missing.join(', ')}`)
+      setStatus('error')
+      return
+    }
+    setStatus('loading')
+    try {
+      const fd = new FormData()
+      fd.append('date', form.date)
+      fd.append('code', form.code)
+      fd.append('batch_number', form.batch_number)
+      fd.append('reason', form.reason)
+      fd.append('qc_validation', form.qc_validation)
+      fd.append('is_valid', form.is_valid)
+      files.forEach(f => fd.append('files', f))
+
+      const res = await fetch(apiUrl + '/complaints/create', {
+        method: 'POST',
+        body: fd,
+      })
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`)
+      setStatus('success')
+      setForm({ date: today, code: '', batch_number: '', reason: '', qc_validation: '', is_valid: true })
+      setFiles([])
+      if (onCreated) onCreated()
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to submit. Please try again.')
+      setStatus('error')
+    }
+  }
+
+  const fields = [
+    { name: 'date', label: 'Date', type: 'date', placeholder: '' },
+    { name: 'code', label: 'Code', type: 'text', placeholder: 'e.g. CC-2026-001' },
+    { name: 'batch_number', label: 'Batch Number', type: 'text', placeholder: 'e.g. BN-4892' },
+    { name: 'reason', label: 'Reason', type: 'text', placeholder: 'Describe the complaint reason' },
+    { name: 'qc_validation', label: 'QC Validation', type: 'text', placeholder: 'Validation details' },
+  ]
+
+  return (
+    <div className="entry-page">
+      <div className="entry-container">
+        <div className="entry-header">
+          <h2 className="entry-title">CUSTOMER COMPLAINT</h2>
+          <p className="entry-subtitle">COMPLAINT RECORD</p>
+        </div>
+
+        <div className="entry-form">
+          <div className="form-grid">
+            {fields.map(({ name, label, type, placeholder }) => (
+              <div key={name} className="form-group">
+                <label className="form-label" htmlFor={`cc-${name}`}>{label}</label>
+                <input
+                  id={`cc-${name}`}
+                  name={name}
+                  type={type}
+                  value={form[name]}
+                  onChange={handleChange}
+                  placeholder={placeholder}
+                  className="form-input"
+                />
+              </div>
+            ))}
+
+            <div className="form-group">
+              <label className="form-label">Valid?</label>
+              <label className="toggle-label">
+                <input
+                  type="checkbox"
+                  name="is_valid"
+                  checked={form.is_valid}
+                  onChange={handleChange}
+                  className="toggle-input"
+                />
+                <span className="toggle-switch"></span>
+                <span className="toggle-text">{form.is_valid ? 'YES' : 'NO'}</span>
+              </label>
+            </div>
+
+            <div className="form-group form-group--full">
+              <label className="form-label">Attachments</label>
+              <div className="file-upload-area">
+                <label className="file-upload-btn">
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleFileChange}
+                    className="file-input-hidden"
+                  />
+                  CHOOSE FILES
+                </label>
+                {files.length > 0 && (
+                  <div className="file-list">
+                    {files.map((f, i) => (
+                      <div key={i} className="file-chip">
+                        <span className="file-chip-name">{f.name}</span>
+                        <button className="file-chip-remove" onClick={() => removeFile(i)}>x</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {files.length === 0 && (
+                  <span className="file-upload-hint">No files selected</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {status === 'error' && (
+            <div className="form-alert form-alert--error">
+              <span className="alert-icon">!</span>
+              {errorMsg}
+            </div>
+          )}
+          {status === 'success' && (
+            <div className="form-alert form-alert--success">
+              <span className="alert-icon">ok</span>
+              Complaint submitted successfully!
+            </div>
+          )}
+
+          <div className="form-footer">
+            <div className="json-preview">
+              <p className="preview-label">PAYLOAD PREVIEW</p>
+              <pre className="preview-code">{JSON.stringify({ ...form, files: files.map(f => f.name) }, null, 2)}</pre>
+            </div>
+            <button
+              className={`submit-btn ${status === 'loading' ? 'submit-btn--loading' : ''}`}
+              onClick={handleSubmit}
+              disabled={status === 'loading'}
+            >
+              {status === 'loading' ? (
+                <><span className="btn-spinner"></span> Submitting...</>
+              ) : 'SUBMIT COMPLAINT'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const STATUS_MAP = {
   0: { label: 'OTHERS', color: '#6b7280' },
   1: { label: 'NO RESAMPLE', color: '#f4c430' },
@@ -433,13 +610,143 @@ function ResamplesModal({ apiUrl, statusFilter, onClose, onDashboardRefresh }) {
   )
 }
 
+function ComplaintDetailModal({ complaint, apiUrl, onClose }) {
+  const fmt = (iso) => {
+    if (!iso) return '—'
+    return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  }
+
+  const attachmentKeys = complaint.attachments ? complaint.attachments.split(',') : []
+  const [attachmentUrls, setAttachmentUrls] = useState({})
+  const [loadingAttachments, setLoadingAttachments] = useState(false)
+
+  useEffect(() => {
+    if (attachmentKeys.length === 0) return
+    setLoadingAttachments(true)
+    Promise.all(
+      attachmentKeys.map(key =>
+        fetch(apiUrl + '/complaints/attachment-url?key=' + encodeURIComponent(key))
+          .then(res => res.json())
+          .then(data => ({ key, url: data.url }))
+          .catch(() => ({ key, url: null }))
+      )
+    ).then(results => {
+      const map = {}
+      results.forEach(r => { map[r.key] = r.url })
+      setAttachmentUrls(map)
+      setLoadingAttachments(false)
+    })
+  }, [apiUrl, complaint.attachments])
+
+  return (
+    <div className="modal-backdrop modal-backdrop--top" onClick={onClose}>
+      <div className="modal complaint-detail-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="modal-title-group">
+            <div>
+              <h2 className="modal-title">COMPLAINT DETAILS</h2>
+              <p className="modal-subtitle">{complaint.code}</p>
+            </div>
+          </div>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="modal-body">
+          <div className="detail-grid">
+            <div className="detail-item">
+              <span className="detail-label">CODE</span>
+              <span className="detail-value">{complaint.code}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">DATE</span>
+              <span className="detail-value">{fmt(complaint.date)}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">BATCH NUMBER</span>
+              <span className="detail-value">{complaint.batch_number}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">VALID</span>
+              <span className={`detail-value detail-badge ${complaint.is_valid ? 'detail-badge--valid' : 'detail-badge--invalid'}`}>
+                {complaint.is_valid ? 'YES' : 'NO'}
+              </span>
+            </div>
+            <div className="detail-item detail-item--full">
+              <span className="detail-label">REASON</span>
+              <span className="detail-value">{complaint.reason}</span>
+            </div>
+            <div className="detail-item detail-item--full">
+              <span className="detail-label">QC VALIDATION</span>
+              <span className="detail-value">{complaint.qc_validation}</span>
+            </div>
+            {attachmentKeys.length > 0 && (
+              <div className="detail-item detail-item--full">
+                <span className="detail-label">ATTACHMENTS</span>
+                {loadingAttachments ? (
+                  <span className="detail-value" style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Loading attachments...</span>
+                ) : (
+                  <div className="detail-attachments">
+                    {attachmentKeys.map((key, i) => {
+                      const url = attachmentUrls[key]
+                      const filename = key.split('/').pop()
+                      return url ? (
+                        <a key={i} href={url} target="_blank" rel="noreferrer" className="detail-attachment-link">
+                          {filename}
+                        </a>
+                      ) : (
+                        <span key={i} className="detail-attachment-link" style={{ opacity: 0.5 }}>
+                          {filename} (unavailable)
+                        </span>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="detail-item">
+              <span className="detail-label">CREATED</span>
+              <span className="detail-value">{fmt(complaint.createdDate)}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">UPDATED</span>
+              <span className="detail-value">{fmt(complaint.updatedDate)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button className="submit-btn" style={{ padding: '0.6rem 1.5rem', fontSize: '0.8rem' }} onClick={onClose}>CLOSE</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function App() {
-  const [page, setPage] = useState('dashboard') // 'dashboard' | 'entry'
+  const [page, setPage] = useState('dashboard') // 'dashboard' | 'entry' | 'complaint'
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   // undefined = closed, null = all cases, 1/2/3 = filtered by status
   const [modalStatus, setModalStatus] = useState(undefined)
+  const [complaints, setComplaints] = useState([])
+  const [selectedComplaint, setSelectedComplaint] = useState(null)
   const apiUrl = import.meta.env.VITE_API_URL
+
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark')
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark')
+
+  const fetchComplaints = useCallback(() => {
+    fetch(apiUrl + '/complaints/all')
+      .then(res => res.json())
+      .then(data => setComplaints(data))
+      .catch(err => console.error('Error fetching complaints:', err))
+  }, [apiUrl])
 
   const fetchDashboard = useCallback(() => {
     fetch(apiUrl + '/qc_cases/dashboard')
@@ -452,7 +759,8 @@ function App() {
         console.error('Error fetching data:', err)
         setLoading(false)
       })
-  }, [apiUrl])
+    fetchComplaints()
+  }, [apiUrl, fetchComplaints])
 
   useEffect(() => { fetchDashboard() }, [fetchDashboard])
 
@@ -501,17 +809,29 @@ function App() {
               + Log Entry
             </button>
             <button
+              className={`nav-btn ${page === 'complaint' ? 'nav-btn--active' : ''}`}
+              onClick={() => setPage('complaint')}
+            >
+              + Complaint
+            </button>
+            <button
               className="nav-btn"
               onClick={() => setModalStatus(null)}
             >
               All Cases
             </button>
           </nav>
-          <div className="year-badge">{data?.year ?? new Date().getFullYear()}</div>
+          <div className="header-right">
+            <button className="theme-toggle" onClick={toggleTheme} title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+              {theme === 'dark' ? '\u2600' : '\u263E'}
+            </button>
+            <div className="year-badge">{data?.year ?? new Date().getFullYear()}</div>
+          </div>
         </div>
       </header>
 
       {page === 'entry' && <LogEntryPage apiUrl={apiUrl} onCreated={fetchDashboard} />}
+      {page === 'complaint' && <CustomerComplaintPage apiUrl={apiUrl} onCreated={fetchDashboard} />}
 
       {page === 'dashboard' && data && <div className="dashboard-grid">
         {/* Quality Issues */}
@@ -521,12 +841,12 @@ function App() {
             <BarChart data={data.quality_issues}>
               <XAxis
                 dataKey="month"
-                stroke="#9ca3af"
-                tick={{ fill: '#9ca3af', fontSize: 12 }}
+                stroke={theme === 'dark' ? '#9ca3af' : '#9ca3af'}
+                tick={{ fill: theme === 'dark' ? '#9ca3af' : '#6b7280', fontSize: 12 }}
               />
               <YAxis
-                stroke="#9ca3af"
-                tick={{ fill: '#9ca3af', fontSize: 12 }}
+                stroke={theme === 'dark' ? '#9ca3af' : '#9ca3af'}
+                tick={{ fill: theme === 'dark' ? '#9ca3af' : '#6b7280', fontSize: 12 }}
               />
               <Bar dataKey="count" radius={[8, 8, 0, 0]}>
                 {data.quality_issues.map((entry, index) => (
@@ -548,7 +868,7 @@ function App() {
                     <path
                       d="M 10 50 A 40 40 0 0 1 90 50"
                       fill="none"
-                      stroke="#2d3548"
+                      className="gauge-track"
                       strokeWidth="8"
                       strokeLinecap="round"
                     />
@@ -611,9 +931,22 @@ function App() {
         {/* Customer Complaints */}
         <div className="card customer-complaints">
           <h2 className="card-title">CUSTOMER COMPLAINT</h2>
-          <div className="coming-soon-overlay">
-            <span className="coming-soon-text">COMING SOON</span>
-          </div>
+          {complaints.length === 0 ? (
+            <div className="complaint-empty">No complaints recorded.</div>
+          ) : (
+            <div className="complaint-code-list">
+              {complaints.map(c => (
+                <button
+                  key={c.id}
+                  className="complaint-code-btn"
+                  onClick={() => setSelectedComplaint(c)}
+                >
+                  <span className="complaint-code-text">{c.code}</span>
+                  <span className={`complaint-valid-dot ${c.is_valid ? 'complaint-valid-dot--yes' : 'complaint-valid-dot--no'}`}></span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* QS Rated */}
@@ -645,6 +978,14 @@ function App() {
           statusFilter={modalStatus}
           onClose={() => setModalStatus(undefined)}
           onDashboardRefresh={fetchDashboard}
+        />
+      )}
+
+      {selectedComplaint && (
+        <ComplaintDetailModal
+          complaint={selectedComplaint}
+          apiUrl={apiUrl}
+          onClose={() => setSelectedComplaint(null)}
         />
       )}
     </div>
