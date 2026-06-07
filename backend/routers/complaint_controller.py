@@ -15,12 +15,14 @@ from db.models.customer_complaint_model import (
 )
 from db.repositories.customer_complaint import (
     create_complaint,
+    delete_complaint,
     get_all_complaints,
     get_complaint,
     get_complaints_by_month,
     update_complaint,
 )
 from database import get_session
+from lib.sse_hub import hub
 
 router = APIRouter(prefix="/complaints", tags=["Customer Complaints"])
 
@@ -98,7 +100,9 @@ async def create_complaint_endpoint(
         is_valid=is_valid,
         attachments=",".join(attachment_keys) if attachment_keys else None,
     )
-    return await create_complaint(db, complaint_data)
+    created = await create_complaint(db, complaint_data)
+    await hub.publish("data:complaints", {"action": "create", "id": getattr(created, "id", None)})
+    return created
 
 
 @router.get("/all", response_model=List[CustomerComplaint])
@@ -117,6 +121,24 @@ async def get_complaint_endpoint(complaint_id: str, db: AsyncSession = Depends(g
     if not complaint:
         raise HTTPException(status_code=404, detail="Complaint not found")
     return complaint
+
+
+@router.delete("/{complaint_id}")
+async def delete_complaint_endpoint(complaint_id: str, db: AsyncSession = Depends(get_session)):
+    deleted = await delete_complaint(db, complaint_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    # Best-effort cleanup of S3 attachments; do not fail the request if S3 is unreachable.
+    if deleted.attachments:
+        for key in [k for k in deleted.attachments.split(",") if k]:
+            try:
+                s3.delete_object(Bucket=BUCKET, Key=key)
+            except Exception:
+                pass
+
+    await hub.publish("data:complaints", {"action": "delete", "id": complaint_id})
+    return {"id": complaint_id, "deleted": True}
 
 
 @router.post("/update", response_model=CustomerComplaint)
@@ -140,4 +162,5 @@ async def update_complaint_endpoint(
     updated = await update_complaint(db, update_data)
     if not updated:
         raise HTTPException(status_code=404, detail="Complaint not found")
+    await hub.publish("data:complaints", {"action": "update", "id": getattr(updated, "id", None)})
     return updated

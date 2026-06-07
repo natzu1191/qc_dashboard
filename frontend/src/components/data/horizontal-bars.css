@@ -1,0 +1,48 @@
+.hbars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.hbar {
+  display: grid;
+  grid-template-columns: 6rem 1fr 2.5rem;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: 0.875rem;
+}
+
+.hbar-label {
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hbar-track {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.hbar-fill {
+  display: block;
+  height: 100%;
+  background: var(--ink-1);
+  border-radius: 999px;
+}
+
+.hbar-value {
+  color: var(--ink-1);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.hbars-empty {
+  padding: 1.5rem 0;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 0.875rem;
+  margin: 0;
+}

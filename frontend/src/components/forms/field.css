@@ -1,0 +1,140 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.field--full { grid-column: 1 / -1; }
+
+.field-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.field-required { color: var(--bad); }
+
+.field-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--ink-3);
+}
+
+.field-error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--bad);
+}
+
+/* ── Inputs ────────────────────────────────────────────────── */
+.input,
+.select,
+.textarea {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--ink-1);
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-2);
+  padding: 0.5625rem 0.75rem;
+  transition: border-color 100ms var(--ease-out), box-shadow 100ms var(--ease-out), background 100ms var(--ease-out);
+  outline: none;
+}
+.input::placeholder,
+.textarea::placeholder { color: var(--ink-3); }
+
+.input:hover:not(:focus),
+.select:hover:not(:focus),
+.textarea:hover:not(:focus) { border-color: var(--ink-3); }
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.input--mono { font-family: var(--font-mono); }
+
+.textarea { min-height: 5rem; resize: vertical; }
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.25rem;
+  cursor: pointer;
+}
+
+input[type="date"].input::-webkit-calendar-picker-indicator {
+  opacity: 0.55;
+  cursor: pointer;
+  filter: invert(0);
+}
+:root[data-theme="dark"] input[type="date"].input::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+}
+
+/* ── Checkbox + toggle ────────────────────────────────────── */
+.checkrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.checkitem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  padding: 0.4375rem 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-2);
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--ink-1);
+  background: var(--surface);
+  user-select: none;
+  transition: border-color 100ms var(--ease-out), background 100ms var(--ease-out);
+}
+.checkitem:hover { border-color: var(--ink-3); }
+.checkitem input { accent-color: var(--brand); cursor: pointer; }
+.checkitem[data-checked="true"] {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  user-select: none;
+  cursor: pointer;
+}
+.toggle input { display: none; }
+.toggle-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: var(--hairline-strong);
+  border-radius: 999px;
+  transition: background 140ms var(--ease-out);
+}
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--surface);
+  border-radius: 50%;
+  transition: transform 140ms var(--ease-out);
+}
+.toggle input:checked + .toggle-switch { background: var(--brand); }
+.toggle input:checked + .toggle-switch::after { transform: translateX(16px); }
+.toggle-text { font-size: 0.875rem; color: var(--ink-1); }

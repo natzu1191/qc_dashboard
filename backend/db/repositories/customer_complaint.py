@@ -35,6 +35,19 @@ async def update_complaint(db: AsyncSession, data: CustomerComplaintUpdate) -> C
     return complaint
 
 
+async def delete_complaint(db: AsyncSession, complaint_id: str) -> CustomerComplaint | None:
+    """Delete a complaint and return the deleted row (so callers can clean up attachments)."""
+    result = await db.execute(
+        select(CustomerComplaint).where(CustomerComplaint.id == complaint_id)
+    )
+    complaint = result.scalars().first()
+    if not complaint:
+        return None
+    await db.delete(complaint)
+    await db.commit()
+    return complaint
+
+
 async def get_all_complaints(db: AsyncSession) -> list[CustomerComplaint]:
     statement = select(CustomerComplaint)
     result = await db.execute(statement)

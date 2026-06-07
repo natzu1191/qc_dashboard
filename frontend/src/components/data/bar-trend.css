@@ -1,0 +1,27 @@
+.bartrend {
+  width: 100%;
+}
+
+.bartrend-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-2);
+  padding: 0.5rem 0.625rem;
+  box-shadow: var(--shadow-modal);
+  min-width: 6rem;
+}
+.bartrend-tooltip-label {
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  margin-bottom: 0.125rem;
+}
+.bartrend-tooltip-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ink-1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* recharts emits inline focus outline on bars; suppress for cleanliness */
+.recharts-wrapper :focus,
+.recharts-wrapper :focus-visible { outline: none; }

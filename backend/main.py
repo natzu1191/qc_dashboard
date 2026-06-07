@@ -1,17 +1,29 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from routers import qc_controller, complaint_controller
+from routers import qc_controller, complaint_controller, broadcast_controller
 import os
+import re
 
 app = FastAPI()
 origins = [
     "https://qc-dashboard-8fq5.vercel.app",
-    "http://localhost:5173"
+    "http://localhost:5173",
 ]
+# Allow any device on the production LAN (e.g. the TV browser) to connect to
+# the dev server. Matches http(s)://<host>(:port) for private IP ranges.
+lan_origin_regex = re.compile(
+    r"^https?://("
+    r"localhost|127\.0\.0\.1"
+    r"|10\.\d{1,3}\.\d{1,3}\.\d{1,3}"
+    r"|192\.168\.\d{1,3}\.\d{1,3}"
+    r"|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}"
+    r")(:\d+)?$"
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=lan_origin_regex.pattern,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,6 +43,7 @@ async def root():
 
 app.include_router(qc_controller.router)
 app.include_router(complaint_controller.router)
+app.include_router(broadcast_controller.router)
 
 if __name__ == "__main__":
     import uvicorn

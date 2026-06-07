@@ -1,0 +1,63 @@
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.125rem;
+}
+.form-grid--stack { grid-template-columns: 1fr; }
+
+@media (max-width: 540px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+/* ── File drop / chips ─────────────────────────────────────── */
+.filedrop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filedrop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5625rem 0.875rem;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: var(--r-2);
+  font-size: 0.875rem;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color 100ms var(--ease-out), color 100ms var(--ease-out), background 100ms var(--ease-out);
+}
+.filedrop-btn:hover { border-color: var(--ink-3); color: var(--ink-1); background: var(--surface-hover); }
+
+.filedrop-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.filechip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-1);
+  font-size: 0.8125rem;
+  color: var(--ink-1);
+}
+.filechip-name { max-width: 9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filechip-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--r-1);
+  color: var(--ink-3);
+  font-size: 1rem;
+  line-height: 1;
+}
+.filechip-x:hover { color: var(--bad); background: var(--bad-soft); }
