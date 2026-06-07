@@ -1,0 +1,30 @@
+.page {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 2rem) clamp(1rem, 4vw, 2.5rem) 4rem;
+}
+
+.page-section + .page-section {
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.page-eyebrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.page-eyebrow h2 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: 0;
+}
+
+.page-eyebrow .meta {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}

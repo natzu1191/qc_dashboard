@@ -4,8 +4,9 @@ from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from dto.request_dto import CreateCaseRequest, UpdateCaseRequest
 from db.models.qc_case_model import QC_Case, QCCreate, QCUpdate
-from db.repositories.qc_case import create_qc_case, get_all_cases_by_status, get_cases_count_by_status, get_qc_case, update_qc_case, get_all_cases, get_quality_issues_by_month, get_resample_percentage_by_month, get_customer_complaints_by_month, get_qs_ratings_by_current_month
+from db.repositories.qc_case import create_qc_case, delete_qc_case, get_all_cases_by_status, get_cases_count_by_status, get_qc_case, update_qc_case, get_all_cases, get_quality_issues_by_month, get_resample_percentage_by_month, get_customer_complaints_by_month, get_qs_ratings_by_current_month
 from database import get_session
+from lib.sse_hub import hub
 import datetime
 
 router = APIRouter(prefix="/qc_cases", tags=["QC Cases"])
@@ -25,7 +26,9 @@ async def create_qc_case_endpoint(data: CreateCaseRequest, db: AsyncSession = De
         standard=data.standard,
         status=1
     )
-    return await create_qc_case(db, qc_case_create)
+    created = await create_qc_case(db, qc_case_create)
+    await hub.publish("data:cases", {"action": "create", "id": getattr(created, "id", None)})
+    return created
 
 @router.post("/getcase", response_model=List[QC_Case])
 async def get_qc_case_endpoint(qc_case_id: int = Form(...), db: AsyncSession = Depends(get_session)):
@@ -40,7 +43,16 @@ async def update_qc_case_endpoint(data: UpdateCaseRequest, db: AsyncSession = De
     updated_case = await update_qc_case(db, qc_case_update)
     if not updated_case:
         raise HTTPException(status_code=404, detail="QC Case not found")
+    await hub.publish("data:cases", {"action": "update", "id": getattr(updated_case, "id", None)})
     return updated_case
+@router.delete("/{qc_case_id}")
+async def delete_qc_case_endpoint(qc_case_id: str, db: AsyncSession = Depends(get_session)):
+    deleted = await delete_qc_case(db, qc_case_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="QC Case not found")
+    await hub.publish("data:cases", {"action": "delete", "id": qc_case_id})
+    return {"id": qc_case_id, "deleted": True}
+
 @router.get("/getallcases", response_model=List[QC_Case])
 async def get_all_qc_cases(db: AsyncSession = Depends(get_session)):
     return await get_all_cases(db)

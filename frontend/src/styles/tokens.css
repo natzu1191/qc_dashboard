@@ -1,0 +1,123 @@
+/* ─────────────────────────────────────────────────────────────
+ * QC Dashboard — Design tokens
+ *
+ * Color system in OKLCH. Two themes (light default, dark via
+ * data-theme="dark"). Brand accent is a signal vermillion;
+ * status colors are independent semantic roles, never
+ * borrowed from the brand ramp.
+ * ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Brand — used sparingly: mark, primary CTA, active nav, focus */
+  --brand: oklch(0.58 0.18 30);
+  --brand-hover: oklch(0.54 0.18 30);
+  --brand-press: oklch(0.5 0.18 30);
+  --brand-fg: oklch(0.99 0.005 30);
+  --brand-soft: oklch(0.58 0.18 30 / 0.12);
+
+  /* Status — semantic only */
+  --ok: oklch(0.62 0.14 150);
+  --ok-soft: oklch(0.62 0.14 150 / 0.14);
+  --warn: oklch(0.72 0.13 80);
+  --warn-soft: oklch(0.72 0.13 80 / 0.18);
+  --bad: oklch(0.52 0.2 25);
+  --bad-soft: oklch(0.52 0.2 25 / 0.14);
+  --neutral: oklch(0.65 0.02 30);
+  --neutral-soft: oklch(0.65 0.02 30 / 0.14);
+
+  /* Easing */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Radii */
+  --r-1: 4px;
+  --r-2: 6px;
+  --r-3: 10px;
+  --r-4: 14px;
+
+  /* Z-scale (semantic) */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-backdrop: 800;
+  --z-modal: 900;
+  --z-toast: 1000;
+  --z-tooltip: 1100;
+
+  /* Typography */
+  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'JetBrains Mono', monospace;
+
+  /* Type scale (1.333 ratio, ≥1.25 between adjacent steps) */
+  --fs-display: clamp(4rem, 8vw, 5.5rem);
+  --fs-h1: clamp(1.75rem, 3vw, 2.25rem);
+  --fs-h2: 1.5rem;
+  --fs-h3: 1.125rem;
+  --fs-body: 0.9375rem;
+  --fs-small: 0.8125rem;
+  --fs-caption: 0.75rem;
+
+  /* Hairline lift on cards in dark mode — flat by default in light */
+  --lift: none;
+}
+
+/* ── TV display mode ───────────────────────────────────────────
+ * Activated via <html data-mode="tv">. Scales the type ramp up
+ * for 40–55" TVs viewed at 4–8 ft.
+ * ──────────────────────────────────────────────────────────── */
+:root[data-mode="tv"] {
+  --fs-display: clamp(6rem, 11vw, 9rem);
+  --fs-h1:      clamp(3rem, 5vw, 4rem);
+  --fs-h2:      2.25rem;
+  --fs-h3:      1.75rem;
+  --fs-body:    1.5rem;     /* 24px */
+  --fs-small:   1.125rem;   /* 18px */
+  --fs-caption: 1rem;       /* 16px */
+}
+
+/* ── Light theme (default) ─────────────────────────────────── */
+:root,
+:root[data-theme="light"] {
+  --bg: oklch(0.985 0.003 40);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.97 0.003 40);
+  --surface-hover: oklch(0.94 0.005 40);
+  --ink-1: oklch(0.18 0.01 40);
+  --ink-2: oklch(0.42 0.01 40);
+  --ink-3: oklch(0.55 0.01 40);
+  --ink-4: oklch(0.72 0.01 40);
+  --hairline: oklch(0.9 0.005 40);
+  --hairline-strong: oklch(0.82 0.005 40);
+  --focus: oklch(0.58 0.18 30 / 0.35);
+  --selection: oklch(0.58 0.18 30 / 0.2);
+  --scrim: oklch(0.18 0.01 40 / 0.3);
+  --shadow-modal: 0 16px 48px -16px oklch(0.18 0.01 40 / 0.18), 0 4px 12px -4px oklch(0.18 0.01 40 / 0.08);
+  --shadow-sheet: -16px 0 48px -16px oklch(0.18 0.01 40 / 0.18);
+  color-scheme: light;
+}
+
+/* ── Dark theme ────────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --bg: oklch(0.155 0.005 40);
+  --surface: oklch(0.195 0.005 40);
+  --surface-2: oklch(0.22 0.005 40);
+  --surface-hover: oklch(0.255 0.006 40);
+  --ink-1: oklch(0.96 0.005 40);
+  --ink-2: oklch(0.72 0.005 40);
+  --ink-3: oklch(0.55 0.005 40);
+  --ink-4: oklch(0.42 0.005 40);
+  --hairline: oklch(0.28 0.008 40);
+  --hairline-strong: oklch(0.36 0.008 40);
+  --focus: oklch(0.7 0.18 30 / 0.4);
+  --selection: oklch(0.58 0.18 30 / 0.32);
+  --scrim: oklch(0 0 0 / 0.5);
+  --shadow-modal: 0 16px 48px -16px oklch(0 0 0 / 0.6), 0 4px 12px -4px oklch(0 0 0 / 0.4);
+  --shadow-sheet: -16px 0 48px -16px oklch(0 0 0 / 0.5);
+  --brand: oklch(0.7 0.18 30);
+  --brand-hover: oklch(0.76 0.17 30);
+  --brand-press: oklch(0.64 0.18 30);
+  --ok: oklch(0.72 0.14 150);
+  --warn: oklch(0.8 0.13 80);
+  --bad: oklch(0.66 0.2 25);
+  color-scheme: dark;
+}

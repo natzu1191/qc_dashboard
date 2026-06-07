@@ -25,6 +25,15 @@ async def update_qc_case(db: AsyncSession, qc_case_update: QCUpdate) -> QC_Case:
         await db.refresh(qc_case)
     return qc_case
 
+async def delete_qc_case(db: AsyncSession, qc_case_id: str) -> bool:
+    result = await db.execute(select(QC_Case).where(QC_Case.id == qc_case_id))
+    qc_case = result.scalars().first()
+    if not qc_case:
+        return False
+    await db.delete(qc_case)
+    await db.commit()
+    return True
+
 async def get_all_cases(db: AsyncSession) -> list[QC_Case]:
     statement = select(QC_Case)
     result = await db.execute(statement)

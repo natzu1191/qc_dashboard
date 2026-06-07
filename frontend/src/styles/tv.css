@@ -1,0 +1,281 @@
+/* ─────────────────────────────────────────────────────────────
+ * TV display layout. Scoped to <html data-mode="tv">.
+ * No interactive affordances: hover, focus rings, click cursors
+ * are all suppressed because the TV has no input.
+ * ───────────────────────────────────────────────────────────── */
+
+:root[data-mode="tv"] body {
+  font-size: var(--fs-body);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+:root[data-mode="tv"] * {
+  cursor: default !important;
+}
+
+:root[data-mode="tv"] button,
+:root[data-mode="tv"] a {
+  pointer-events: none;
+}
+
+.tv-shell {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--bg);
+  color: var(--ink-1);
+}
+
+/* ── Top status bar ─────────────────────────────────────────── */
+.tv-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--surface);
+  font-size: var(--fs-small);
+}
+.tv-statusbar-brand {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand);
+  font-weight: 600;
+}
+.tv-statusbar-view {
+  flex: 1;
+  font-size: var(--fs-h3);
+  font-weight: 500;
+}
+.tv-statusbar-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+}
+.tv-statusbar-dot-pulse {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 999px;
+  background: var(--neutral);
+}
+.tv-statusbar-dot.is-live .tv-statusbar-dot-pulse {
+  background: var(--ok);
+  box-shadow: 0 0 0 0 var(--ok);
+  animation: tv-pulse 2s infinite;
+}
+.tv-statusbar-dot.is-offline {
+  color: var(--warn);
+}
+.tv-statusbar-dot.is-offline .tv-statusbar-dot-pulse {
+  background: var(--warn);
+}
+@keyframes tv-pulse {
+  0%   { box-shadow: 0 0 0 0 oklch(0.72 0.14 150 / 0.6); }
+  70%  { box-shadow: 0 0 0 12px oklch(0.72 0.14 150 / 0); }
+  100% { box-shadow: 0 0 0 0 oklch(0.72 0.14 150 / 0); }
+}
+
+/* ── Main stage ─────────────────────────────────────────────── */
+.tv-stage {
+  padding: 2rem 2.5rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.tv-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2rem;
+}
+.tv-section-head h1 {
+  font-size: var(--fs-h1);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.tv-section-head h2,
+.tv-section h2 {
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+.tv-section-meta {
+  font-size: var(--fs-small);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+}
+.tv-section {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-3);
+  padding: 1.5rem 1.75rem;
+}
+
+.tv-mono { font-family: var(--font-mono); }
+.tv-dim { color: var(--ink-3); }
+.tv-reason { color: var(--ink-2); }
+.tv-empty {
+  padding: 3rem;
+  text-align: center;
+  font-size: var(--fs-h3);
+  color: var(--ink-3);
+}
+
+/* ── Dashboard ──────────────────────────────────────────────── */
+.tv-dashboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto 1fr 1fr;
+  gap: 1.5rem;
+  height: 100%;
+}
+.tv-dashboard > .tv-section-head { grid-column: 1 / -1; }
+.tv-dashboard > .metric-hero { grid-column: 1 / -1; }
+.tv-dashboard > .tv-metric-band { grid-column: 1 / -1; }
+.tv-metric-band {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+:root[data-mode="tv"] .metric-hero-value {
+  font-size: var(--fs-display);
+}
+:root[data-mode="tv"] .metric-compact-value {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1;
+}
+:root[data-mode="tv"] .metric-compact-label,
+:root[data-mode="tv"] .metric-compact-hint,
+:root[data-mode="tv"] .metric-hero-label,
+:root[data-mode="tv"] .metric-hero-hint {
+  font-size: var(--fs-small);
+}
+
+/* ── Cases table (TV variant) ───────────────────────────────── */
+.tv-cases { display: flex; flex-direction: column; gap: 1.5rem; height: 100%; }
+.tv-cases-table {
+  display: grid;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-3);
+  overflow: hidden;
+}
+.tv-cases-head,
+.tv-cases-row {
+  display: grid;
+  grid-template-columns: 12rem 12rem 1fr 12rem 10rem;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  align-items: center;
+}
+.tv-cases-head {
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--hairline);
+}
+.tv-cases-row {
+  border-bottom: 1px solid var(--hairline);
+  font-size: var(--fs-body);
+}
+.tv-cases-row:last-child { border-bottom: 0; }
+.tv-cases-row.is-highlighted {
+  background: var(--brand-soft);
+  border-left: 6px solid var(--brand);
+  padding-left: calc(1.5rem - 6px);
+}
+.tv-reason {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Complaints (TV variant) ────────────────────────────────── */
+.tv-complaints { display: flex; flex-direction: column; gap: 1.5rem; height: 100%; }
+.tv-complaint-feature {
+  background: var(--surface);
+  border: 1px solid var(--brand);
+  border-radius: var(--r-3);
+  padding: 2rem 2.25rem;
+  display: grid;
+  gap: 1.25rem;
+}
+.tv-complaint-feature-head {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.tv-complaint-feature-code {
+  font-size: var(--fs-h1);
+  font-weight: 600;
+}
+.tv-complaint-feature-reason {
+  font-size: var(--fs-h3);
+  line-height: 1.4;
+  margin: 0;
+}
+.tv-complaint-feature-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 0;
+}
+.tv-complaint-feature-meta dt {
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+}
+.tv-complaint-feature-meta dd {
+  margin: 0.25rem 0 0 0;
+  font-size: var(--fs-body);
+}
+.tv-complaint-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-3);
+  overflow: hidden;
+}
+.tv-complaint-row {
+  display: grid;
+  grid-template-columns: 10rem 1fr 8rem 10rem;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--hairline);
+  font-size: var(--fs-body);
+}
+.tv-complaint-row:last-child { border-bottom: 0; }
+
+/* ── Worklist density on TV ─────────────────────────────────── */
+:root[data-mode="tv"] .worklist-row {
+  padding: 1rem 1.25rem;
+  font-size: var(--fs-body);
+}
+:root[data-mode="tv"] .worklist-code,
+:root[data-mode="tv"] .worklist-batch {
+  font-size: var(--fs-h3);
+}
+
+/* ── StatusChip larger on TV ────────────────────────────────── */
+:root[data-mode="tv"] .chip {
+  font-size: var(--fs-small);
+  padding: 0.375rem 0.75rem;
+}
