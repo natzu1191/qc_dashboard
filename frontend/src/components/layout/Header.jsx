@@ -4,6 +4,7 @@ import './header.css';
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', key: 'D' },
   { id: 'cases', label: 'Cases', key: 'A' },
+  { id: 'complaints', label: 'Complaints', key: 'P' },
 ];
 
 const TV_VIEW_LABEL = { dashboard: 'Dashboard', cases: 'Cases', complaints: 'Complaints' };

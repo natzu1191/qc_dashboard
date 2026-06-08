@@ -6,8 +6,10 @@ import { CommandPalette } from './components/primitives/CommandPalette';
 import { BroadcastPanel } from './components/control/BroadcastPanel';
 import { Dashboard } from './pages/Dashboard';
 import { AllCases } from './pages/AllCases';
+import { AllComplaints } from './pages/AllComplaints';
 import { LogEntrySheet } from './pages/sheets/LogEntrySheet';
 import { ComplaintSheet } from './pages/sheets/ComplaintSheet';
+import { EditComplaintSheet } from './pages/sheets/EditComplaintSheet';
 import { EditCaseSheet } from './pages/sheets/EditCaseSheet';
 import { ComplaintDetailModal } from './pages/modals/ComplaintDetailModal';
 import { useTheme } from './lib/theme';
@@ -34,6 +36,7 @@ export function ControlApp() {
   const [cmplOpen, setCmplOpen] = useState(false);
   const [editCase, setEditCase] = useState(null);
   const [detailCmpl, setDetailCmpl] = useState(null);
+  const [editCmpl, setEditCmpl] = useState(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
 
@@ -77,6 +80,7 @@ export function ControlApp() {
   // Hotkeys
   useHotkey('d', () => setPage('dashboard'));
   useHotkey('a', () => setPage('cases'));
+  useHotkey('p', () => setPage('complaints'));
   useHotkey('l', () => setLogOpen(true));
   useHotkey('c', () => setCmplOpen(true));
   useHotkey('k', () => setPaletteOpen(true), { meta: true });
@@ -84,6 +88,7 @@ export function ControlApp() {
   const actions = useMemo(() => [
     { id: 'go-dashboard', label: 'Go to Dashboard', shortcut: 'D', run: () => setPage('dashboard') },
     { id: 'go-cases', label: 'Go to Cases', shortcut: 'A', run: () => setPage('cases') },
+    { id: 'go-complaints', label: 'Go to Complaints', shortcut: 'P', run: () => setPage('complaints') },
     { id: 'new-entry', label: 'Log new entry', shortcut: 'L', run: () => setLogOpen(true) },
     { id: 'new-complaint', label: 'File complaint', shortcut: 'C', run: () => setCmplOpen(true) },
     { id: 'toggle-theme', label: theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme', run: toggleTheme },
@@ -122,6 +127,15 @@ export function ControlApp() {
             onOpenComplaint={setDetailCmpl}
             onSelectCase={handleSelectCase}
             onNavigateCases={() => setPage('cases')}
+          />
+        ) : page === 'complaints' ? (
+          <AllComplaints
+            complaints={complaints}
+            loading={loading}
+            onSelect={setDetailCmpl}
+            onEdit={setEditCmpl}
+            highlightedId={broadcast?.highlighted_id || null}
+            onHighlight={(id) => highlightOnTV(id, 'complaints')}
           />
         ) : (
           <AllCases
@@ -168,6 +182,13 @@ export function ControlApp() {
         onHighlight={(id) => highlightOnTV(id, 'complaints')}
         highlightedId={broadcast?.highlighted_id || null}
         onDeleted={bumpReload}
+        onEdit={(c) => { setDetailCmpl(null); setEditCmpl(c); }}
+      />
+      <EditComplaintSheet
+        open={!!editCmpl}
+        complaint={editCmpl}
+        onOpenChange={(v) => { if (!v) setEditCmpl(null); }}
+        onUpdated={bumpReload}
       />
       <CommandPalette
         open={paletteOpen}

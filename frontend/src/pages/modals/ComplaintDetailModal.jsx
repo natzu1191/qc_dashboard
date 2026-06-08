@@ -7,7 +7,7 @@ import { fmtDate } from '../../lib/format';
 import { api } from '../../lib/api';
 import './complaint-detail.css';
 
-export function ComplaintDetailModal({ open, complaint, onOpenChange, onHighlight, highlightedId, onDeleted }) {
+export function ComplaintDetailModal({ open, complaint, onOpenChange, onHighlight, highlightedId, onDeleted, onEdit }) {
   const [urls, setUrls] = useState({});
   const [loadingAtt, setLoadingAtt] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -154,6 +154,9 @@ export function ComplaintDetailModal({ open, complaint, onOpenChange, onHighligh
           >
             {highlightedId === complaint.id ? '★ Highlighted on TV' : 'Highlight on TV'}
           </Button>
+        )}
+        {!confirmDelete && onEdit && complaint.id && (
+          <Button variant="ghost" onClick={() => onEdit(complaint)}>Edit</Button>
         )}
         {!confirmDelete && (
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Close</Button>
