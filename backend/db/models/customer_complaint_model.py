@@ -41,7 +41,9 @@ class CustomerComplaintCreate(CustomerComplaintBase):
 
 
 class CustomerComplaintUpdate(SQLModel):
+    date: Optional[datetime] = None
     code: Optional[str] = None
+    batch_number: Optional[str] = None
     reason: Optional[str] = None
     qc_validation: Optional[str] = None
     attachments: Optional[str] = None

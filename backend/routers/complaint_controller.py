@@ -141,26 +141,52 @@ async def delete_complaint_endpoint(complaint_id: str, db: AsyncSession = Depend
     return {"id": complaint_id, "deleted": True}
 
 
-@router.post("/update", response_model=CustomerComplaint)
+@router.put("/{complaint_id}", response_model=CustomerComplaint)
 async def update_complaint_endpoint(
+    complaint_id: str,
+    date: str = Form(...),
     code: str = Form(...),
-    reason: str = Form(None),
-    qc_validation: str = Form(None),
-    is_valid: bool = Form(None),
+    batch_number: str = Form(...),
+    reason: str = Form(...),
+    qc_validation: str = Form(...),
+    is_valid: bool = Form(...),
+    existing_attachments: str = Form(""),  # comma-joined keys the user kept
     files: List[UploadFile] = File(default=[]),
     db: AsyncSession = Depends(get_session),
 ):
-    attachment_keys = await upload_files_to_supabase(files)
+    existing = await get_complaint(db, complaint_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    try:
+        parsed_date = datetime.datetime.strptime(date, "%Y-%m-%d")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format")
+
+    kept_keys = [k for k in existing_attachments.split(",") if k]
+    new_keys = await upload_files_to_supabase(files)
+    final_keys = kept_keys + new_keys
+
+    # Best-effort cleanup of attachments the user removed.
+    prev_keys = [k for k in (existing.attachments or "").split(",") if k]
+    for key in [k for k in prev_keys if k not in final_keys]:
+        try:
+            s3.delete_object(Bucket=BUCKET, Key=key)
+        except Exception:
+            pass
 
     update_data = CustomerComplaintUpdate(
+        date=parsed_date,
         code=code,
+        batch_number=batch_number,
         reason=reason,
         qc_validation=qc_validation,
         is_valid=is_valid,
-        attachments=",".join(attachment_keys) if attachment_keys else None,
+        attachments=",".join(final_keys) if final_keys else None,
+        updatedDate=datetime.datetime.now(datetime.timezone.utc),
     )
-    updated = await update_complaint(db, update_data)
+    updated = await update_complaint(db, complaint_id, update_data)
     if not updated:
         raise HTTPException(status_code=404, detail="Complaint not found")
-    await hub.publish("data:complaints", {"action": "update", "id": getattr(updated, "id", None)})
+    await hub.publish("data:complaints", {"action": "update", "id": complaint_id})
     return updated

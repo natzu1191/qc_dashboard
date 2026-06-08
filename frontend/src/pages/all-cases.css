@@ -55,7 +55,7 @@
 .ac-table-wrap {
   border: 1px solid var(--hairline);
   border-radius: var(--r-3);
-  overflow: hidden;
+  overflow-x: auto;
   background: var(--surface);
 }
 
@@ -106,6 +106,8 @@
 
 .ac-table tr.is-highlighted td { background: var(--brand-soft); }
 .ac-pin { color: var(--brand); margin-right: 0.375rem; }
+
+.ac-table tbody tr.ac-row-clickable { cursor: pointer; }
 
 .ac-empty {
   text-align: center;

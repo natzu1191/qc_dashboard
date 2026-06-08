@@ -32,6 +32,8 @@ export const api = {
   allComplaints: () => request('/complaints/all'),
   createComplaint: (formData) =>
     request('/complaints/create', { method: 'POST', body: formData }),
+  updateComplaint: (id, formData) =>
+    request(`/complaints/${encodeURIComponent(id)}`, { method: 'PUT', body: formData }),
   deleteComplaint: (id) =>
     request(`/complaints/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   attachmentUrl: (key) =>

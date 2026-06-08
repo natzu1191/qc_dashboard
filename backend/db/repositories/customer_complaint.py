@@ -22,9 +22,11 @@ async def get_complaint(db: AsyncSession, complaint_id: str) -> CustomerComplain
     return result.scalars().first()
 
 
-async def update_complaint(db: AsyncSession, data: CustomerComplaintUpdate) -> CustomerComplaint:
+async def update_complaint(
+    db: AsyncSession, complaint_id: str, data: CustomerComplaintUpdate
+) -> CustomerComplaint | None:
     result = await db.execute(
-        select(CustomerComplaint).where(CustomerComplaint.code == data.code)
+        select(CustomerComplaint).where(CustomerComplaint.id == complaint_id)
     )
     complaint = result.scalars().first()
     if complaint:
